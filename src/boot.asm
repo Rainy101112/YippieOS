@@ -1,6 +1,7 @@
 BITS 16
 ORG 0x7C00
 
+
 mov [drive_number], dl
 mov ah, 8
 int 0x13
@@ -9,30 +10,9 @@ mov [number_of_heads], dh
 and cl, 0x3F
 mov [sectors_per_track], cl
 
-init:   
-    mov al, 1
-    mov cx, [sectors_per_track]
-    xor dx, dx
-    div cx
-
-    inc dl
-    mov [sector], dl
-    
-    mov cx, [number_of_heads]
-    xor dx, dx
-    div cx
-    mov [head], dl 
-    mov [cylinder], al
-
-mov ah, 2
 mov al, 1
-mov ch, [cylinder]
-mov cl, [sector]
-mov dh, [head]
-mov dl, [drive_number]
 mov bx, 0x7C00 + 512
-int 0x13
-
+call load_sector
 jmp boot_2
 
 loop:
@@ -98,6 +78,31 @@ print_integer:
     call print_byte
     ret
 
+; Expects the sector in AL
+; Expects the memory location in BX
+load_sector:
+    mov cx, [sectors_per_track]
+    xor dx, dx
+    div cx
+
+    inc dl
+    mov [sector], dl
+    
+    mov cx, [number_of_heads]
+    xor dx, dx
+    div cx
+    mov [head], dl 
+    mov [cylinder], al
+    
+    mov ah, 2
+    mov al, 1
+    mov ch, [cylinder]
+    mov cl, [sector]
+    mov dh, [head]
+    mov dl, [drive_number]
+    int 0x13
+    ret 
+    
 times 510-($-$$) db 0
 dw 0xAA55
 
