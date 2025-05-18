@@ -10,17 +10,17 @@ and cl, 0x3F
 mov [sectors_per_track], cl
 
 init:   
-    mov al, 2
-    mov cl, [sectors_per_track]
-    xor dl, dl
-    div cl
+    mov al, 1
+    mov cx, [sectors_per_track]
+    xor dx, dx
+    div cx
 
     inc dl
     mov [sector], dl
     
-    mov cl, [number_of_heads]
-    xor dl, dl
-    div cl
+    mov cx, [number_of_heads]
+    xor dx, dx
+    div cx
     mov [head], dl 
     mov [cylinder], al
 
@@ -33,34 +33,15 @@ mov dl, [drive_number]
 mov bx, 0x7C00 + 512
 int 0x13
 
-; Debugging
-mov al, [cylinder]
-call print_byte
-mov bx, newline
-call print
-
-mov al, [sector]
-call print_byte
-mov bx, newline
-call print
-
-mov al, [head]
-call print_byte
-mov bx, newline
-call print
-
-mov al, [test_magic]
-call print_byte
-
 jmp boot_2
 
 loop:
     hlt
     jmp loop
 
-number_of_heads: db 0
 drive_number: db 0
-sectors_per_track: db 0
+number_of_heads: dw 0
+sectors_per_track: dw 0
 sector: db 0
 head: db 0
 cylinder: db 0
@@ -120,8 +101,6 @@ print_integer:
 times 510-($-$$) db 0
 dw 0xAA55
 
-test_magic: db 0x49
-
 boot_2:
     mov al, 0x16
     call print_byte
@@ -129,18 +108,3 @@ boot_2:
 loop_2:
     hlt
     jmp loop_2
-
-
-; Comments and stuff
-
-; mov ah, 0x0E
-; mov bx, msg
-; call print
-; mov bx, msg1
-; call print
-
-; mov ah, 8
-; mov dl, 0x80
-; int 0x13
-; mov ah, 0x0
-; mov al, dh
