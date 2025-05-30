@@ -5,14 +5,14 @@ boot_2_start:
 boot_2_sectors_count: dw (boot_2_end - boot_2_start + 511)/512
 
 boot_2:
+    mov sp, stack_end
+    
     mov al, 0x69
     call print_byte
 
 loop_2:
     hlt
     jmp loop_2
-
-resb 512 * 12
 
 ; We expect digit in AL
 print_digit:
@@ -40,5 +40,8 @@ print_byte:
 
     call print_digit
     ret
+
+resb 4096
+stack_end:
 
 boot_2_end:
